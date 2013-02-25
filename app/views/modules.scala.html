@@ -1,0 +1,87 @@
+@(modules: List[String])
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Play 2 Modules</title>
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                font-family: "Helvetica Neue", "Helvetica", sans-serif;
+            }
+            h1 {
+                border-top: 5px solid #92d13d;
+                margin-top: 0;
+                padding-left: 1em;
+            }
+            article {
+                max-width: 50em;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            input {
+                width: 20em;
+                font-size: 1.5em;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Play 2 Modules</h1>
+        <article>
+            <input type=search placeholder="Search a module…" />
+            @for(m <- modules) {
+                <div class=module>@Html(m)</div>
+            }
+        </article>
+        <script>
+            (function () {
+                var Stream = function (pusher) {
+                    this.pusher = pusher;
+                };
+                Stream.prototype.foreach = function (f) {
+                    this.pusher(f);
+                };
+                Stream.prototype.map = function (f) {
+                    var self = this;
+                    return new Stream(function (g) { self.pusher(function (e) { g(f(e)); }); });
+                };
+                Stream.ofEvents = function (event, target) {
+                    return new Stream(function (f) {
+                        (target || window).addEventListener(event, function (e) { f(e) });
+                    })
+                };
+
+                var arr = function (col) {
+                    var r = [];
+                    for (var i = 0, l = col.length ; i < l ; i++) {
+                        r.push(col.item(i));
+                    }
+                    return r
+                };
+
+                // --- The program really starts here
+                var modules = arr(document.getElementsByClassName('module'));
+                var input = document.querySelector('input');
+
+                Stream.ofEvents('keyup', input).map(function (_) {
+                    var regexp = new RegExp(input.value, 'i');
+                    return modules.map(function (m) {
+                        return {
+                            module: m,
+                            matches: regexp.test(m.textContent)
+                        }
+                    })
+                }).foreach(function (ms) {
+                    ms.forEach(function (m) { m.module.style.display = m.matches ? 'block' : 'none'; });
+                });
+            })();
+        </script>
+    </body>
+</html>
