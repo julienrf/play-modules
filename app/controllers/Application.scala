@@ -12,11 +12,8 @@ object Application extends Controller {
   val index = Cached(_ => "modules", duration = 60 * 60) {
     Action {
       Async {
-        for {
-          result <- WS.url("http://raw.github.com/playframework/Play20/master/documentation/manual/Modules.md").get()
-        } yield {
-          Ok(views.html.modules(Modules.parse(result.body)))
-        }
+        WS.url("http://raw.github.com/playframework/Play20/master/documentation/manual/Modules.md").get()
+          .map(result => Ok(views.html.modules(Modules.parse(result.body))))
       }
     }
   }
