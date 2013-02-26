@@ -5,6 +5,7 @@
 <html>
     <head>
         <title>Play 2 Modules</title>
+        <meta name="viewport" content="width=device-width">
         <style>
             html, body {
                 margin: 0;
@@ -18,13 +19,21 @@
                 margin-top: 0;
                 padding-left: 1em;
             }
+            @@media min-width: 640px {
+                article {
+                    max-width: 50em;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+                input {
+                    width: 20em;
+                }
+            }
             article {
-                max-width: 50em;
-                margin-left: auto;
-                margin-right: auto;
+                padding-left: .5em;
+                padding-right: .5em;
             }
             input {
-                width: 20em;
                 font-size: 1.5em;
                 margin-left: auto;
                 margin-right: auto;
