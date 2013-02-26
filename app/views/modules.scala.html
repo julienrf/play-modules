@@ -56,6 +56,13 @@
             .module {
                 margin-bottom: 2em;
             }
+            footer {
+                background-color: #343434;
+                color: #BBB;
+                text-align: center;
+                font-size: smaller;
+                padding: 1em;
+            }
         </style>
     </head>
     <body>
@@ -66,6 +73,9 @@
                 <div class=module>@Html(m)</div>
             }
         </article>
+        <footer>
+            Written by Julien Richard-Foy. Fork it on <a href="http://github.com/julienrf/play-modules">GitHub</a>.
+        </footer>
         <script>
             (function () {
                 var Stream = function (pusher) {
