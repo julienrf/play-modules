@@ -52,6 +52,13 @@
                     var self = this;
                     return new Stream(function (g) { self.pusher(function (e) { g(f(e)); }); });
                 };
+                Stream.prototype.merge = function (s) {
+                    var self = this;
+                    return new Stream(function (f) {
+                        s.pusher(function (e) { f(e) });
+                        self.pusher(function (e) { f(e) });
+                    });
+                };
                 Stream.ofEvents = function (event, target) {
                     return new Stream(function (f) {
                         (target || window).addEventListener(event, function (e) { f(e) });
@@ -70,17 +77,19 @@
                 var modules = arr(document.getElementsByClassName('module'));
                 var input = document.querySelector('input');
 
-                Stream.ofEvents('keyup', input).map(function (_) {
-                    var regexp = new RegExp(input.value, 'i');
-                    return modules.map(function (m) {
-                        return {
-                            module: m,
-                            matches: regexp.test(m.textContent)
-                        }
+                Stream.ofEvents('keyup', input).merge(Stream.ofEvents('click', input))
+                    .map(function (_) {
+                        var regexp = new RegExp(input.value, 'i');
+                        return modules.map(function (m) {
+                            return {
+                                module: m,
+                                matches: regexp.test(m.textContent)
+                            }
+                        })
                     })
-                }).foreach(function (ms) {
-                    ms.forEach(function (m) { m.module.style.display = m.matches ? 'block' : 'none'; });
-                });
+                    .foreach(function (ms) {
+                        ms.forEach(function (m) { m.module.style.display = m.matches ? 'block' : 'none'; });
+                    });
             })();
         </script>
     </body>
