@@ -1,139 +1,60 @@
 @(modules: List[String])
 
-<!DOCTYPE html>
+@layout {
+    <input type=search placeholder="Search a module…" />
+    @for(m <- modules) {
+        <div class=module>@Html(m)</div>
+    }
+    <script>
+        (function () {
+            var Stream = function (pusher) {
+                this.pusher = pusher;
+            };
+            Stream.prototype.foreach = function (f) {
+                this.pusher(f);
+            };
+            Stream.prototype.map = function (f) {
+                var self = this;
+                return new Stream(function (g) { self.pusher(function (e) { g(f(e)); }); });
+            };
+            Stream.prototype.merge = function (s) {
+                var self = this;
+                return new Stream(function (f) {
+                    s.pusher(function (e) { f(e) });
+                    self.pusher(function (e) { f(e) });
+                });
+            };
+            Stream.ofEvents = function (event, target) {
+                return new Stream(function (f) {
+                    (target || window).addEventListener(event, function (e) { f(e) });
+                })
+            };
 
-<html>
-    <head>
-        <title>Play 2 Modules</title>
-        <meta name="viewport" content="width=device-width">
-        <style>
-            html, body {
-                margin: 0;
-                padding: 0;
-            }
-            body {
-                font-family: "Helvetica Neue", "Helvetica", sans-serif;
-            }
-            h1 {
-                border-top: 5px solid #92d13d;
-                margin-top: 0;
-                padding-left: 1em;
-            }
-            @@media min-width: 640px {
-                article {
-                    max-width: 50em;
-                    margin-left: auto;
-                    margin-right: auto;
+            var arr = function (col) {
+                var r = [];
+                for (var i = 0, l = col.length ; i < l ; i++) {
+                    r.push(col.item(i));
                 }
-                input {
-                    width: 20em;
-                }
-            }
-            article {
-                padding-left: .5em;
-                padding-right: .5em;
-                word-wrap: break-word;
-            }
-            input {
-                font-size: 1.5em;
-                margin-left: auto;
-                margin-right: auto;
-                display: block;
-            }
-            ul {
-                list-style-type: none;
-                padding-left: 0;
-            }
-            h2 {
-                margin-bottom: 0;
-            }
-            a {
-                color: #548b0c;
-                text-decoration: none;
-            }
-            a:hover {
-                text-decoration: underline;
-            }
-            .module {
-                margin-bottom: 2em;
-            }
-            footer {
-                background-color: #343434;
-                color: #777;
-                text-align: center;
-                font-size: smaller;
-                padding: 1em;
-            }
-            footer a {
-                color: #999;
-            }
-            footer a:hover {
-                color: #92d13d;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Play 2 Modules</h1>
-        <article>
-            <input type=search placeholder="Search a module…" />
-            @for(m <- modules) {
-                <div class=module>@Html(m)</div>
-            }
-        </article>
-        <footer>
-            Written by Julien Richard-Foy. Fork it on <a href="http://github.com/julienrf/play-modules">GitHub</a>.
-        </footer>
-        <script>
-            (function () {
-                var Stream = function (pusher) {
-                    this.pusher = pusher;
-                };
-                Stream.prototype.foreach = function (f) {
-                    this.pusher(f);
-                };
-                Stream.prototype.map = function (f) {
-                    var self = this;
-                    return new Stream(function (g) { self.pusher(function (e) { g(f(e)); }); });
-                };
-                Stream.prototype.merge = function (s) {
-                    var self = this;
-                    return new Stream(function (f) {
-                        s.pusher(function (e) { f(e) });
-                        self.pusher(function (e) { f(e) });
-                    });
-                };
-                Stream.ofEvents = function (event, target) {
-                    return new Stream(function (f) {
-                        (target || window).addEventListener(event, function (e) { f(e) });
+                return r
+            };
+
+            // --- The program really starts here
+            var modules = arr(document.getElementsByClassName('module'));
+            var input = document.querySelector('input');
+
+            Stream.ofEvents('keyup', input).merge(Stream.ofEvents('click', input))
+                .map(function (_) {
+                    var regexp = new RegExp(input.value, 'i');
+                    return modules.map(function (m) {
+                        return {
+                            module: m,
+                            matches: regexp.test(m.textContent)
+                        }
                     })
-                };
-
-                var arr = function (col) {
-                    var r = [];
-                    for (var i = 0, l = col.length ; i < l ; i++) {
-                        r.push(col.item(i));
-                    }
-                    return r
-                };
-
-                // --- The program really starts here
-                var modules = arr(document.getElementsByClassName('module'));
-                var input = document.querySelector('input');
-
-                Stream.ofEvents('keyup', input).merge(Stream.ofEvents('click', input))
-                    .map(function (_) {
-                        var regexp = new RegExp(input.value, 'i');
-                        return modules.map(function (m) {
-                            return {
-                                module: m,
-                                matches: regexp.test(m.textContent)
-                            }
-                        })
-                    })
-                    .foreach(function (ms) {
-                        ms.forEach(function (m) { m.module.style.display = m.matches ? 'block' : 'none'; });
-                    });
-            })();
-        </script>
-    </body>
-</html>
+                })
+                .foreach(function (ms) {
+                    ms.forEach(function (m) { m.module.style.display = m.matches ? 'block' : 'none'; });
+                });
+        })();
+    </script>
+}
