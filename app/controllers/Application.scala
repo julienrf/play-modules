@@ -9,7 +9,13 @@ import models.Modules
 
 object Application extends Controller {
   
-  val index = Action {
+  val index = Action { implicit request =>
+    val notModified = for {
+      requestEtag <- request.headers.get(IF_NONE_MATCH)
+      etag <- Cache.getAs[String]("etag")
+      if etag == requestEtag
+    } yield NotModified
+    notModified.getOrElse {
       Cache.getAs[Result]("modules").getOrElse {
         Async {
           WS.url("http://raw.github.com/playframework/Play20/master/documentation/manual/Modules.md").get()
@@ -17,13 +23,16 @@ object Application extends Controller {
               if (githubResult.status < 400) {
                 val result = Ok(views.html.modules(Modules.parse(githubResult.body)))
                 Cache.set("modules", result, 60 * 60 * 3) // 3 hours
-                result
-              } else Ok(views.html.oops())
+                val etag = System.currentTimeMillis().toString
+                Cache.set("etag", etag)
+                result.withHeaders(ETAG -> etag)
+              } else InternalServerError(views.html.oops())
             } recover {
-              case _ => Ok(views.html.oops())
+              case _ => InternalServerError(views.html.oops())
             }
         }
       }
+    }
   }
   
 }
