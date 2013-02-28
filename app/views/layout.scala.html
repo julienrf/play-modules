@@ -5,78 +5,22 @@
   <head>
       <title>Play 2 Modules</title>
       <meta name="viewport" content="width=device-width">
-      <style>
-          html, body {
-              margin: 0;
-              padding: 0;
-          }
-          body {
-              font-family: "Helvetica Neue", "Helvetica", sans-serif;
-          }
-          h1 {
-              border-top: 5px solid #92d13d;
-              margin-top: 0;
-              padding-left: 1em;
-          }
-          @@media min-width: 640px {
-              article {
-                  max-width: 50em;
-                  margin-left: auto;
-                  margin-right: auto;
-              }
-              input {
-                  width: 20em;
-              }
-          }
-          article {
-              padding-left: .5em;
-              padding-right: .5em;
-              word-wrap: break-word;
-          }
-          input {
-              font-size: 1.5em;
-              margin-left: auto;
-              margin-right: auto;
-              display: block;
-          }
-          ul {
-              list-style-type: none;
-              padding-left: 0;
-          }
-          h2 {
-              margin-bottom: 0;
-          }
-          a {
-              color: #548b0c;
-              text-decoration: none;
-          }
-          a:hover {
-              text-decoration: underline;
-          }
-          .module {
-              margin-bottom: 2em;
-          }
-          footer {
-              background-color: #343434;
-              color: #777;
-              text-align: center;
-              font-size: smaller;
-              padding: 1em;
-              margin-top: 2em;
-          }
-          footer a {
-              color: #999;
-          }
-          footer a:hover {
-              color: #92d13d;
-          }
-      </style>
+      <link rel="stylesheet" href="/assets/stylesheets/main.css" type="text/css" media="screen" title="no title" charset="utf-8">
+      <link href='http://fonts.googleapis.com/css?family=PT+Serif:700italic' rel='stylesheet' type='text/css'>
+      <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700,300' rel='stylesheet' type='text/css'>
   </head>
   <body>
-    <h1>Play 2 Modules</h1>
-    <article>
-      @body
-    </article>
+    <header id="top">
+      <a href="/" id="logo">Play</a>
+    </header>
+    <section id="content">
+      <header>
+          <input type="text" id="module-search" placeholder="Type anything to filter" results="10">
+      </header>
+      <article id="list">
+        @body
+      </article>
+    </section>
     <footer>
       Written by Julien Richard-Foy. Fork it on <a href="http://github.com/julienrf/play-modules">GitHub</a>.
     </footer>
