@@ -21,11 +21,11 @@ object Application extends Controller {
           WS.url("http://raw.github.com/playframework/Play20/master/documentation/manual/Modules.md").get()
             .map { githubResult =>
               if (githubResult.status < 400) {
-                val result = Ok(views.html.modules(Modules.parse(githubResult.body)))
-                Cache.set("modules", result, 60 * 60 * 3) // 3 hours
                 val etag = System.currentTimeMillis().toString
+                val result = Ok(views.html.modules(Modules.parse(githubResult.body))).withHeaders(ETAG -> etag)
+                Cache.set("modules", result, 60 * 60 * 3) // 3 hours
                 Cache.set("etag", etag)
-                result.withHeaders(ETAG -> etag)
+                result
               } else InternalServerError(views.html.oops())
             } recover {
               case _ => InternalServerError(views.html.oops())
